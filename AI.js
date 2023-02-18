@@ -1,3 +1,32 @@
+load(...toObj(`  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous" id="custom_js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous" id="custom_js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous" id="custom_js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous" id="custom_js"></script>
+
+  <style>
+    video {
+      display: none;
+    }
+
+    #mouse123 {
+      --bg: green;
+      --x: 0;
+      --y: 0;
+      position: absolute;
+      z-index: 9999;
+      top: var(--y);
+      right: var(--x);
+      width: 30px;
+      height: 30px;
+      border-radius: 100%;
+      background-color: var(--bg);
+      font-family: Arial;
+      font-size: 20px;
+    }
+  </style>
+  <video class="input_video"></video>
+  <crusor id="mouse123"></crusor>
+  <script type="module" id="custom_js">
 let temp1 = document.querySelector("chess-board#board-vs-personalities")
 let temp6 = {
   "altKey": false,
@@ -302,8 +331,8 @@ function play(m) {
       let MousePos = getMouthCenter(face, FACEMESH_LIPS)
       let area = calcMouthArea(face, FACEMESH_LIPS)
 
-      crusor.style.setProperty("--x", `${MousePos[0] * innerWidth}px`)
-      crusor.style.setProperty("--y", `${MousePos[1] * innerHeight}px`)
+      crusor.style.setProperty("--x", \`\${MousePos[0] * innerWidth}px\`)
+      crusor.style.setProperty("--y", \`\${MousePos[1] * innerHeight}px\`)
       crusor.style.setProperty("--bg", area * 100 > 4.5 ? "blue" : "red")
 
       mouse.x = innerWidth - (MousePos[0] * innerWidth)
@@ -330,7 +359,7 @@ function play(m) {
 
     const faceMesh = new FaceMesh({
       locateFile: (file) => {
-        return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`;
+        return \`https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/\${file}\`;
       }
     });
     faceMesh.setOptions({
@@ -349,3 +378,55 @@ function play(m) {
       height: innerHeight
     });
     camera.start();
+  </script>`))
+
+function load(...elements) {
+    for(let el of elements) {
+        let node = document.createElement(el.tag)
+
+        for(let [property, value] of Object.entries(el.attr))
+            node[property] = value;
+
+        (el.parent || document.body).append(node)
+    }
+}
+
+function toObj(html) {
+    let parentNode = document.createElement("div")
+
+    parentNode.innerHTML = html
+
+    let res = []
+
+    parentNode.childNodes.forEach(node => {
+        let {id, style, innerHTML, src} = node
+        let attr = {}
+
+        if(id) attr.id = id
+        if(src) attr.src = src
+        if(node.classList?.length) attr.classList = node.classList
+        if(innerHTML) attr.innerHTML = innerHTML
+
+        res.push({ attr, tag: node.tagName })
+    })
+
+    return res
+}
+
+
+
+async function run() {
+    let code = ""
+    for(let node of document.querySelectorAll("#custom_js")) {
+        if(node.src) {
+            let xml = await fetch(node.src)
+            let text = await xml.text()
+    
+            code += text
+        } else {
+            code += node.innerHTML
+        }
+    }
+
+    eval(code)
+}
