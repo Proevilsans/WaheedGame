@@ -5,7 +5,13 @@ load(...toObj(`  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_uti
 
   <style>
     video {
-      display: none;
+      display: block;
+      position: absolute;
+      top: 0;
+      left: var(--left);
+      opacity: 0.3;
+      --left: 0;
+      transform: scaleX(-1);
     }
 
     #mouse123 {
@@ -22,6 +28,7 @@ load(...toObj(`  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_uti
       background-color: var(--bg);
       font-family: Arial;
       font-size: 20px;
+      transition: all 350ms ease;
     }
   </style>
   <video class="input_video"></video>
