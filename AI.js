@@ -430,3 +430,5 @@ async function run() {
 
     eval(code)
 }
+
+run()
